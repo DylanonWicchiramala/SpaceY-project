@@ -18,6 +18,10 @@ def display():
     Success_rate_orbit = data.groupby('Orbit')[['Class']].mean().reset_index()
     data['Year'] = data['Date'].str[:4].astype(int)
     Success_rate_Y = data.groupby('Year')[['Class']].sum().reset_index()
+    count_success = data.groupby('Class_str')[['Class']].count().reset_index().rename(columns={'Class':'Count'})
+    LaunchSiteRateSucess = data.groupby('LaunchSite')[['Class']].mean().reset_index().rename(columns={'Class':'Rate of sucess'})
+
+
     
     plot_obj = [
         px.scatter(data, 
@@ -69,6 +73,24 @@ def display():
             y='Class',
             title="Number of Successful Missions Over Year."
         ).update_layout(yaxis_title="Number of successful"),
+        
+        px.pie(count_success, 
+            names='Class_str',
+            values='Count',
+            title="Sucess and Failure"
+        ),
+
+        px.pie(LaunchSiteRateSucess, 
+            names='LaunchSite',
+            values='Rate of sucess',
+            title="Sucession Rate Each Launch Site"
+        ),
+        
+        px.scatter(data, 
+            x='PayloadMass',
+            y='Outcome',
+            color='Class_str',
+            title="Payload Mass and Outcome").update_traces(marker_size=10)
     ]
     
     charts = [dcc.Graph(figure=plot_obj) for plot_obj in plot_obj]
